@@ -10,35 +10,54 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::{log, near_bindgen};
 
 // Define the default message
-const DEFAULT_MESSAGE: &str = "Hello";
+const DEFAULT_GUESSING: u32 = 0;
+const DEFAULT_SECRET_NUMBER: u32 = 33;
 
 // Define the contract structure
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Contract {
-    message: String,
+    guessing: u32,
+    secret_number: u32,
 }
 
 // Define the default, which automatically initializes the contract
 impl Default for Contract{
     fn default() -> Self{
-        Self{message: DEFAULT_MESSAGE.to_string()}
+        Self{
+            guessing: DEFAULT_GUESSING,
+            secret_number: DEFAULT_SECRET_NUMBER,
+        }
     }
 }
 
 // Implement the contract structure
 #[near_bindgen]
 impl Contract {
-    // Public method - returns the greeting saved, defaulting to DEFAULT_MESSAGE
-    pub fn get_greeting(&self) -> String {
-        return self.message.clone();
+    // Public method - returns the guessing saved, defaulting to DEFAULT_MESSAGE
+    pub fn get_guessing(&self) -> u32 {
+        return self.guessing.clone();
     }
 
-    // Public method - accepts a greeting, such as "howdy", and records it
-    pub fn set_greeting(&mut self, message: String) {
+    pub fn get_guessing_msg(&self) -> String {
+        let guessing = self.guessing.clone();
+        log!("You guessed number: {}", guessing);
+        let result1: String = format!("You guessed number: {}", guessing);
+
+        let secret_number = self.secret_number.clone();
+        log!("You got secret_number: {}", secret_number);
+        let result2: String = format!("You got secret_number: {}", secret_number);
+
+        let result: String = format!("{result1}, {result2}", result1=result1, result2=result2);
+
+        return result;
+    }
+
+    // Public method - accepts a guessing number, such as "from 1 to 100", and records it
+    pub fn set_guessing(&mut self, guessing: u32) {
         // Use env::log to record logs permanently to the blockchain!
-        log!("Saving greeting {}", message);
-        self.message = message;
+        log!("Saving guessing {}", guessing);
+        self.guessing = guessing;
     }
 }
 
@@ -51,22 +70,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn get_default_greeting() {
+    fn get_default_guessing() {
         let contract = Contract::default();
-        // this test did not call set_greeting so should return the default "Hello" greeting
+        // this test did not call set_guessing so should return the default "Hello" guessing
         assert_eq!(
-            contract.get_greeting(),
-            "Hello".to_string()
+            contract.get_guessing(),
+            "Guess the number".to_string()
         );
     }
 
-    #[test]
-    fn set_then_get_greeting() {
-        let mut contract = Contract::default();
-        contract.set_greeting("howdy".to_string());
-        assert_eq!(
-            contract.get_greeting(),
-            "howdy".to_string()
-        );
-    }
+    // #[test]
+    // fn set_then_get_guessing() {
+    //     let mut contract = Contract::default();
+    //     contract.set_guessing("Guess the number".to_string());
+    //     assert_eq!(
+    //         contract.get_guessing(),
+    //         "Guess the number".to_string()
+    //     );
+    // }
 }

@@ -16,12 +16,16 @@ export async function initContract() {
   window.accountId = window.walletConnection.getAccountId()
 
   // Initializing our contract APIs by contract name and configuration
-  window.contract = await new Contract(window.walletConnection.account(), nearConfig.contractName, {
-    // View methods are read only. They don't modify the state, but usually return some value.
-    viewMethods: ['get_greeting'],
-    // Change methods can modify the state. But you don't receive the returned value when called.
-    changeMethods: ['set_greeting'],
-  })
+  window.contract = await new Contract(
+    window.walletConnection.account(),
+    nearConfig.contractName,
+    {
+      // View methods are read only. They don't modify the state, but usually return some value.
+      viewMethods: ["get_guessing", "get_guessing_msg"],
+      // Change methods can modify the state. But you don't receive the returned value when called.
+      changeMethods: ["set_guessing"],
+    }
+  );
 }
 
 export function logout() {
@@ -38,14 +42,19 @@ export function login() {
   window.walletConnection.requestSignIn(nearConfig.contractName)
 }
 
-export async function set_greeting(message){
-  let response = await window.contract.set_greeting({
-    args:{message: message}
-  })
-  return response
+export async function set_guessing(guessing) {
+  let response = await window.contract.set_guessing({
+    args: { guessing: guessing },
+  });
+  return response;
 }
 
-export async function get_greeting(){
-  let greeting = await window.contract.get_greeting()
-  return greeting
+export async function get_guessing() {
+  let guessing = await window.contract.get_guessing();
+  return guessing;
+}
+
+export async function get_guessing_msg() {
+  let guessingMsg = await window.contract.get_guessing_msg();
+  return guessingMsg;
 }
